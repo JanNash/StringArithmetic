@@ -10,6 +10,8 @@ extension String {
     struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, CustomDebugStringConvertible {
         init(stringLiteral value: String) {
             guard value.count > 0 else { fatalError() }
+            guard [value.first!, value.last!].allSatisfy(\.isNumber) else { fatalError() }
+            
             var separatorIndex: Int?
             var integerValue = ""
             integerValue.reserveCapacity(value.count)
@@ -24,21 +26,20 @@ extension String {
                 }
             }
             
-            self.integerValue = integerValue
-            
+            var decimalPlaces: UInt = 0
             if let separatorIndex = separatorIndex {
-                self.decimalPlaces = UInt(abs(separatorIndex - (value.count - 1)))
+                decimalPlaces = UInt(abs(separatorIndex - (value.count - 1)))
             }
             
             // Purge leading zeroes from integerValue
-            while self.integerValue.first == "0" {
-                self.integerValue.removeFirst()
+            while integerValue.hasPrefix("00") {
+                integerValue.removeFirst()
             }
             
             // Purge trailing zeroes from integerValue, updating decimalPlaces
-            while self.integerValue.last == "0" {
-                self.integerValue.removeLast()
-                self.decimalPlaces -= 1
+            while integerValue.hasSuffix("00") {
+                integerValue.removeLast()
+                decimalPlaces -= 1
             }
             
             // Purge leading zeroes from value
@@ -47,10 +48,13 @@ extension String {
                 sanitizedValue.removeFirst()
             }
             
-            while sanitizedValue.last == "0" {
+            // Purge trailing zeroes from value
+            while sanitizedValue.hasSuffix("00") {
                 sanitizedValue.removeLast()
             }
             
+            self.integerValue = integerValue
+            self.decimalPlaces = decimalPlaces
             self.value = sanitizedValue
         }
         
@@ -58,7 +62,7 @@ extension String {
         var debugDescription: String { "RationalNumber<\(integerValue)e-\(decimalPlaces); value: \(value)>" }
         
         private var integerValue: String
-        private var decimalPlaces: UInt = 0
+        private var decimalPlaces: UInt
         private let value: String
         private let separator: Character = "."
         
