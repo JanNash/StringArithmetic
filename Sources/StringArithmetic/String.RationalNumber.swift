@@ -71,12 +71,12 @@ extension String {
             self.decimalPlaces = decimalPlaces
             
             // Purge leading zeroes from integerValue
-            while self.integerValue.first == "0" {
+            while self.integerValue.hasPrefix("00") {
                 self.integerValue.removeFirst()
             }
             
             // Purge trailing zeroes from integerValue, updating decimalPlaces
-            while self.integerValue.last == "0" {
+            while self.integerValue.hasSuffix("00") {
                 self.integerValue.removeLast()
                 self.decimalPlaces -= 1
             }
