@@ -67,6 +67,9 @@ struct RationalNumber: ExpressibleByStringLiteral {
         var prettifiedValue = value
         Self.removeLeadingZeroes(from: &prettifiedValue)
         Self.removeTrailingZeroes(from: &prettifiedValue)
+        while prettifiedValue.hasSuffix(".0") || prettifiedValue.hasSuffix(".") {
+            prettifiedValue.removeLast()
+        }
         
         self.integerValue = integerValue
         self.decimalPlaces = decimalPlaces
