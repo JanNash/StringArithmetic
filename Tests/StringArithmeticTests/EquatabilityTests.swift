@@ -16,12 +16,18 @@ final class EquatabilityTests: XCTestCase {
     }
     
     func testEquatability3() {
+        let a: RationalNumber = "1"
+        let b: RationalNumber = "1.0"
+        XCTAssertEqual(a, b)
+    }
+    
+    func testEquatability4() {
         let a: RationalNumber = "0"
         let b: RationalNumber = "1"
         XCTAssertNotEqual(a, b)
     }
     
-    func testEquatability4() {
+    func testEquatability5() {
         let a: RationalNumber = "0"
         let b: RationalNumber = "0.1"
         XCTAssertNotEqual(a, b)
@@ -32,5 +38,6 @@ final class EquatabilityTests: XCTestCase {
         ("testEquatability2", testEquatability2),
         ("testEquatability3", testEquatability3),
         ("testEquatability4", testEquatability4),
+        ("testEquatability5", testEquatability5),
     ]
 }
