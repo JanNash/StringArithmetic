@@ -6,13 +6,29 @@
 //
 
 
-struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, CustomDebugStringConvertible {
-    // Operations
-    static func + (lhs: Self, rhs: Self) -> Self { add(lhs, rhs) }
-    
-    // CustomStringConvertible, CustomDebugStringConvertible
+// MARK: CustomStringConvertible, CustomDebugStringConvertible
+extension RationalNumber: CustomStringConvertible, CustomDebugStringConvertible {
     var description: String { value }
     var debugDescription: String { "RationalNumber<\(integerValue)e-\(decimalPlaces); value: \(value)>" }
+}
+
+
+// MARK: Equatable
+extension RationalNumber: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool { lhs.value == rhs.value }
+}
+
+
+// MARK: Hashable
+extension RationalNumber: Hashable {
+    func hash(into hasher: inout Hasher) { value.hash(into: &hasher) }
+}
+
+
+// MARK: Declaration
+struct RationalNumber: ExpressibleByStringLiteral {
+    // Operations
+    static func + (lhs: Self, rhs: Self) -> Self { add(lhs, rhs) }
     
     // State
     private var integerValue: String
