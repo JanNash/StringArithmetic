@@ -7,6 +7,20 @@
 
 
 struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, CustomDebugStringConvertible {
+    // Operations
+    static func + (lhs: Self, rhs: Self) -> Self { add(lhs, rhs) }
+    
+    // CustomStringConvertible, CustomDebugStringConvertible
+    var description: String { value }
+    var debugDescription: String { "RationalNumber<\(integerValue)e-\(decimalPlaces); value: \(value)>" }
+    
+    // State
+    private var integerValue: String
+    private var decimalPlaces: UInt
+    private let value: String
+    private let separator: Character = "."
+    
+    // Initializers
     init(stringLiteral value: String) {
         guard value.count > 0 else { fatalError() }
         guard [value.first!, value.last!].allSatisfy(\.isNumber) else { fatalError() }
@@ -43,14 +57,6 @@ struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, Cust
         self.value = prettifiedValue
     }
     
-    var description: String { value }
-    var debugDescription: String { "RationalNumber<\(integerValue)e-\(decimalPlaces); value: \(value)>" }
-    
-    private var integerValue: String
-    private var decimalPlaces: UInt
-    private let value: String
-    private let separator: Character = "."
-    
     private init(integerValue: String, decimalPlaces: UInt) {
         self.integerValue = integerValue
         self.decimalPlaces = decimalPlaces
@@ -70,22 +76,13 @@ struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, Cust
         value.insert(separator, at: value.index(value.endIndex, offsetBy: -decimalPlacesInt))
         self.value = value
     }
-    
-    private static func removeLeadingZeroes(from value: inout String) {
-        while value.hasPrefix("00") { value.removeFirst() }
-    }
-    
-    private static func removeTrailingZeroes(from value: inout String) {
-        while value.hasSuffix("00") { value.removeLast() }
-    }
-    
-    private mutating func shiftLeft(by decimalPlaces: UInt) {
-        if decimalPlaces == 0 { return }
-        self.integerValue += String(repeating: "0", count: Int(decimalPlaces))
-        self.decimalPlaces += decimalPlaces
-    }
-    
-    static func + (lhs: Self, rhs: Self) -> Self {
+}
+
+
+// MARK: // Private
+// MARK: Addition
+private extension RationalNumber {
+    static func add(_ lhs: Self, _ rhs: Self) -> Self {
         var (greaterIntValue, smallerIntValue): (String, String)
         let decimalPlaces: UInt
         
@@ -117,14 +114,15 @@ struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, Cust
         return RationalNumber(integerValue: integerValue, decimalPlaces: decimalPlaces)
     }
     
-    private static func add(_ first: Character, _ second: Character, _ third: Character) -> (carryOver: Character, value: Character) {
+    // Helpers
+    static func add(_ first: Character, _ second: Character, _ third: Character) -> (carryOver: Character, value: Character) {
         let first = add(first, second)
         let second = add(first.value, third)
         let carryOver = add(first.carryOver, second.carryOver)
         return (carryOver.value, second.value)
     }
     
-    private static func add(_ lhs: Character, _ rhs: Character) -> (carryOver: Character, value: Character) {
+    static func add(_ lhs: Character, _ rhs: Character) -> (carryOver: Character, value: Character) {
         switch (lhs, rhs) {
         case ("0", "0"):                                                    return ("0", "0")
         case ("0", "1"):                                                    return ("0", "1")
@@ -147,5 +145,23 @@ struct RationalNumber: ExpressibleByStringLiteral, CustomStringConvertible, Cust
         case ("9", "9"):                                                    return ("1", "8")
         default:                                                            return add(rhs, lhs)
         }
+    }
+}
+
+
+// MARK: Helpers
+private extension RationalNumber {
+    static func removeLeadingZeroes(from value: inout String) {
+        while value.hasPrefix("00") { value.removeFirst() }
+    }
+    
+    static func removeTrailingZeroes(from value: inout String) {
+        while value.hasSuffix("00") { value.removeLast() }
+    }
+    
+    mutating func shiftLeft(by decimalPlaces: UInt) {
+        if decimalPlaces == 0 { return }
+        self.integerValue += String(repeating: "0", count: Int(decimalPlaces))
+        self.decimalPlaces += decimalPlaces
     }
 }
