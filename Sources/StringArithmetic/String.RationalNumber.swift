@@ -31,31 +31,17 @@ extension String {
                 decimalPlaces = UInt(abs(separatorIndex - (value.count - 1)))
             }
             
-            // Purge leading zeroes from integerValue
-            while integerValue.hasPrefix("00") {
-                integerValue.removeFirst()
-            }
+            let count = integerValue.count
+            Self.removeTrailingZeroes(from: &integerValue)
+            decimalPlaces -= UInt(count - integerValue.count)
             
-            // Purge trailing zeroes from integerValue, updating decimalPlaces
-            while integerValue.hasSuffix("00") {
-                integerValue.removeLast()
-                decimalPlaces -= 1
-            }
-            
-            // Purge leading zeroes from value
-            var sanitizedValue = value
-            while sanitizedValue.hasPrefix("00") {
-                sanitizedValue.removeFirst()
-            }
-            
-            // Purge trailing zeroes from value
-            while sanitizedValue.hasSuffix("00") {
-                sanitizedValue.removeLast()
-            }
+            var prettifiedValue = value
+            Self.removeLeadingZeroes(from: &prettifiedValue)
+            Self.removeTrailingZeroes(from: &prettifiedValue)
             
             self.integerValue = integerValue
             self.decimalPlaces = decimalPlaces
-            self.value = sanitizedValue
+            self.value = prettifiedValue
         }
         
         var description: String { value }
@@ -70,16 +56,11 @@ extension String {
             self.integerValue = integerValue
             self.decimalPlaces = decimalPlaces
             
-            // Purge leading zeroes from integerValue
-            while self.integerValue.hasPrefix("00") {
-                self.integerValue.removeFirst()
-            }
+            Self.removeLeadingZeroes(from: &self.integerValue)
             
-            // Purge trailing zeroes from integerValue, updating decimalPlaces
-            while self.integerValue.hasSuffix("00") {
-                self.integerValue.removeLast()
-                self.decimalPlaces -= 1
-            }
+            let count = self.integerValue.count
+            Self.removeTrailingZeroes(from: &self.integerValue)
+            self.decimalPlaces -= UInt(count - self.integerValue.count)
             
             var value = self.integerValue
             let decimalPlacesInt = Int(self.decimalPlaces)
@@ -89,6 +70,14 @@ extension String {
             }
             value.insert(separator, at: value.index(value.endIndex, offsetBy: -decimalPlacesInt))
             self.value = value
+        }
+        
+        private static func removeLeadingZeroes(from value: inout String) {
+            while value.hasPrefix("00") { value.removeFirst() }
+        }
+        
+        private static func removeTrailingZeroes(from value: inout String) {
+            while value.hasSuffix("00") { value.removeLast() }
         }
         
         private mutating func shiftLeft(by decimalPlaces: UInt) {
